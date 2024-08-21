@@ -1,9 +1,9 @@
 import uuid
+
 from django.contrib.auth import get_user_model
-from django.core.validators import RegexValidator, MinValueValidator
+from django.core.validators import MinValueValidator, RegexValidator
 from django.db import models
 from django.urls import reverse
-
 
 User = get_user_model()
 

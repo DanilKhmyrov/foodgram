@@ -1,6 +1,8 @@
 from django.contrib import admin
-from .models import (Favorite, ShoppingCart, Tag,
-                     Ingredient, Recipe, RecipeIngredient)
+from django.utils.html import format_html
+
+from .models import (Favorite, Ingredient, Recipe, RecipeIngredient,
+                     ShoppingCart, Tag)
 
 
 class RecipeIngredientInline(admin.TabularInline):
@@ -23,18 +25,31 @@ class RecipeAdmin(admin.ModelAdmin):
 
     fieldsets = (
         ('ОСНОВНЫЕ ПОЛЯ', {
-            'fields': ('name', 'author', 'get_favorite_count')
+            'fields': ('name', 'author')
         }),
         ('ДЕТАЛИ', {
             'fields': ('text', 'tags', 'cooking_time', 'image')
         }),
     )
     list_display = ('name', 'author', 'cooking_time',
-                    'image', 'get_favorite_count')
+                    'image_thumbnail', 'get_favorite_count')
     inlines = [RecipeIngredientInline]
     exclude = ('short_code',)
     search_fields = ('name', 'author__username')
     list_filter = ('tags',)
+
+    def image_thumbnail(self, obj):
+        """
+        Возвращает HTML-код для отображения картинки в админке,
+        если она загружена.
+        """
+        if obj.image:
+            return format_html(
+                '<img src="{}" style="width: 50px; height: 50px;" />',
+                obj.image.url)
+        return 'Нет картинки'
+
+    image_thumbnail.short_description = 'Изображение'
 
     def get_favorite_count(self, obj):
         """

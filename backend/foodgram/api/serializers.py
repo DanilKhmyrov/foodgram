@@ -1,11 +1,13 @@
 import base64
-from djoser.serializers import UserCreateSerializer
-from rest_framework import serializers
+
 from django.contrib.auth import get_user_model
 from django.core.files.base import ContentFile
 from django.core.validators import MinValueValidator
+from djoser.serializers import UserCreateSerializer
+from rest_framework import serializers
 
 from .models import Ingredient, Recipe, RecipeIngredient, Tag
+
 User = get_user_model()
 
 
@@ -363,6 +365,23 @@ class SubscriptionsSerializer(CustomUserSerializer):
         """
         fields = CustomUserSerializer.Meta.fields + \
             ('recipes', 'recipes_count')
+
+    def save(self, **kwargs):
+        """
+        Обрабатывает логику подписки при сохранении.
+        """
+        request_user = self.context.get('request').user
+        user_to_subscribe = self.instance
+
+        if request_user == user_to_subscribe:
+            raise serializers.ValidationError(
+                'Вы не можете подписаться на себя.')
+
+        if request_user.subscribed_to.filter(id=user_to_subscribe.id).exists():
+            raise serializers.ValidationError(
+                'Вы уже подписаны на этого пользователя.')
+
+        request_user.subscribed_to.add(user_to_subscribe)
 
     def get_recipes_count(self, obj):
         """

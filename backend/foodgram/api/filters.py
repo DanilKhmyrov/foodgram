@@ -1,8 +1,8 @@
-from django_filters.rest_framework import filters, FilterSet
-from django.db.models import Exists, OuterRef
 from django.contrib.auth import get_user_model
+from django.db.models import Exists, OuterRef
+from django_filters.rest_framework import FilterSet, filters
 
-from .models import Ingredient, Recipe, Favorite, ShoppingCart
+from .models import Favorite, Ingredient, Recipe, ShoppingCart
 
 User = get_user_model()
 
