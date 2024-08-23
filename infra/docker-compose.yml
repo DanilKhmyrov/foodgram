@@ -48,3 +48,5 @@ services:
     volumes:
       - static:/static
       - media:/media:ro
+    depends_on:
+      - backend
