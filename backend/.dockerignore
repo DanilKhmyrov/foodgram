@@ -1,4 +1,6 @@
 venv
 .git
+.gitkeep
 db.sqlite3
 .env
+media
