@@ -18,3 +18,11 @@ class CustomUser(AbstractUser):
         symmetrical=False,
         blank=True
     )
+
+    class Meta:
+        """
+        Мета-класс для модели User, указывающий название модели.
+        """
+        ordering = ['id']
+        verbose_name = 'Пользователь'
+        verbose_name_plural = 'Пользователи'

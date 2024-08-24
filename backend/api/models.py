@@ -31,8 +31,8 @@ class Tag(models.Model):
         """
         Мета-класс для модели Tag, указывающий название модели.
         """
-        verbose_name = "Тег"
-        verbose_name_plural = "Теги"
+        verbose_name = 'Тег'
+        verbose_name_plural = 'Теги'
 
     def __str__(self):
         return self.name
@@ -51,8 +51,8 @@ class Ingredient(models.Model):
         Мета-класс для модели Ingredient, указывающий название модели
         и добавляющий уникальность комбинации названия и единицы измерения.
         """
-        verbose_name = "Ингредиент"
-        verbose_name_plural = "Ингредиенты"
+        verbose_name = 'Ингредиент'
+        verbose_name_plural = 'Ингредиенты'
 
     def __str__(self):
         return self.name
@@ -94,8 +94,8 @@ class Recipe(models.Model):
         """
         Мета-класс для модели Recipe, указывающий название модели и сортировку.
         """
-        verbose_name = "Рецепт"
-        verbose_name_plural = "Рецепты"
+        verbose_name = 'Рецепт'
+        verbose_name_plural = 'Рецепты'
 
     def save(self, *args, **kwargs):
         """
@@ -143,8 +143,8 @@ class RecipeIngredient(models.Model):
         комбинации рецепта и ингредиента.
         """
 
-        verbose_name = "Ингредиент рецепта"
-        verbose_name_plural = "Ингредиенты рецепта"
+        verbose_name = 'Ингредиент рецепта'
+        verbose_name_plural = 'Ингредиенты рецепта'
 
     def __str__(self):
         return f'{self.ingredient.name} - {self.amount} '

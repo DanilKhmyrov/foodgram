@@ -22,7 +22,8 @@ class UserAdmin(admin.ModelAdmin):
 
     fieldsets = (
         ('Основная информация', {
-            'fields': ('username', 'email', 'password',
+            'fields': ('username', 'email', 'first_name',
+                       'last_name', 'password',
                        'avatar', 'avatar_thumbnail')
         }),
         ('Права доступа', {
