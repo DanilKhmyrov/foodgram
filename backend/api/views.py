@@ -86,11 +86,15 @@ class CustomUserViewSet(UserViewSet):
         """
         Возвращает список подписок текущего пользователя.
         """
-        subscribed_users = request.user.subscribed_to.all()
+        subscribed_users = (request.user.subscribed_to
+                            .prefetch_related('recipes')
+                            .all())
         paginator = self.pagination_class()
         page = paginator.paginate_queryset(subscribed_users, request)
         serializer = SubscriptionsSerializer(
-            page, many=True, context={'request': request})
+            page,
+            many=True,
+            context={'request': request})
         return paginator.get_paginated_response(serializer.data)
 
     def subscribe(self, request, *args, **kwargs):

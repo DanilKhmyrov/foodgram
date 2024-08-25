@@ -5,6 +5,8 @@ from django.core.validators import MinValueValidator, RegexValidator
 from django.db import models
 from django.urls import reverse
 
+from backend.foodgram import settings
+
 User = get_user_model()
 
 
@@ -115,7 +117,12 @@ class Recipe(models.Model):
         """
         Возвращает абсолютный URL для рецепта.
         """
-        return reverse('recipes-detail', kwargs={'pk': self.pk})
+        if settings.DEBUG:
+            # В режиме разработки используем путь с /api/
+            return reverse('recipes-detail', kwargs={'pk': self.pk})
+        else:
+            # В режиме продакшена используем путь без /api/
+            return reverse('recipes-detail', kwargs={'pk': self.pk})[4:]
 
     def __str__(self):
         return self.name

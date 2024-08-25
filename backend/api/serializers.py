@@ -355,7 +355,7 @@ class SubscriptionsSerializer(CustomUserSerializer):
     Сериализатор для подписок пользователя, включающий рецепты и их количество.
     """
 
-    recipes = SubRecipeSerializer(many=True)
+    recipes = serializers.SerializerMethodField()
     recipes_count = serializers.SerializerMethodField()
 
     class Meta(CustomUserSerializer.Meta):
@@ -383,19 +383,19 @@ class SubscriptionsSerializer(CustomUserSerializer):
 
         request_user.subscribed_to.add(user_to_subscribe)
 
+    def get_recipes(self, obj):
+        """
+        Получает и сериализует все рецепты пользователя.
+        """
+        recipes = obj.recipes.all()
+        serializer = SubRecipeSerializer(
+            recipes,
+            many=True,
+            context=self.context)
+        return serializer.data
+
     def get_recipes_count(self, obj):
         """
         Возвращает количество рецептов у пользователя.
         """
         return obj.recipes.count()
-
-    def to_representation(self, instance):
-        """
-        Преобразует объект пользователя в сериализованное
-        представление с учётом контекста.
-        """
-        representation = super().to_representation(instance)
-        recipes = self.context.get('recipes', [])
-        representation['recipes'] = SubRecipeSerializer(
-            recipes, many=True).data
-        return representation
