@@ -2,7 +2,7 @@
 <h3 align="center">
     <a href="https://myfoodgram.zapto.org">Адрес сайта</a>
 </h3>
-<h5 style="border-bottom: solid 1px;">Данные для входа (admin user): email --- danil680068@yandex.ru, password --- 1</h5>
+<h5 style="border-bottom: solid 1px;">Данные для входа (admin user): username --- danil, email --- danil680068@yandex.ru, password --- 1</h5>
 
 <h2 align="center">Стек технологий</h2>
 
