@@ -120,7 +120,7 @@ class Recipe(models.Model):
         """
         Мета-класс для модели Recipe, указывающий название модели и сортировку.
         """
-        ordering = ['id']
+        ordering = ['-id']
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
 
