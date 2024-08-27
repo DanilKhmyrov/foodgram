@@ -42,8 +42,10 @@ class CustomUserViewSet(UserViewSet):
         """
         if self.action in ['retrieve', 'list', 'me']:
             return CustomUserSerializer
-        elif self.action in ['create', 'subscriptions']:
+
+        if self.action in ['create', 'subscriptions']:
             return CustomUserCreateSerializer
+
         return super().get_serializer_class()
 
     def get_permissions(self):
@@ -131,9 +133,9 @@ class CustomUserViewSet(UserViewSet):
                 current_user.subscribed_to.remove(user_to_subscribe)
                 return Response({'status': 'Вы отписались от пользователя.'},
                                 status=status.HTTP_204_NO_CONTENT)
-            else:
-                return Response({'status': 'Вы не подписаны на пользователя.'},
-                                status=status.HTTP_400_BAD_REQUEST)
+
+            return Response({'status': 'Вы не подписаны на пользователя.'},
+                            status=status.HTTP_400_BAD_REQUEST)
 
 
 class TagViewSet(ReadOnlyModelViewSet):
@@ -151,7 +153,7 @@ class RecipeViewSet(ModelViewSet):
     обновление, удаление и добавление в избранное и корзину покупок.
     """
 
-    queryset = Recipe.objects.all().order_by('id')
+    queryset = Recipe.objects.all()
     serializer_class = RecipeOutputSerializer
     pagination_class = CustomPageNumberPagination
     filter_backends = [DjangoFilterBackend]
@@ -224,7 +226,7 @@ class RecipeViewSet(ModelViewSet):
         Возвращает короткую ссылку на рецепт.
         """
         recipe = self.get_object()
-        link = request.build_absolute_uri(f"/s/{recipe.short_code}/")
+        link = request.build_absolute_uri(f'/s/{recipe.short_code}/')
         return Response({'short-link': link}, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['post', 'delete'], url_path='favorite')
@@ -273,7 +275,7 @@ class RecipeViewSet(ModelViewSet):
             serializer = SubRecipeSerializer(
                 recipe, context={'request': request})
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        elif request.method == 'DELETE':
+        if request.method == 'DELETE':
             try:
                 shopping_cart = ShoppingCart.objects.get(
                     user=user, recipe=recipe)
@@ -302,9 +304,9 @@ class RecipeViewSet(ModelViewSet):
                 else:
                     ingredients[ingredient.name] = amount
 
-        content = "Список покупок:\n"
+        content = 'Список покупок:\n'
         for name, amount in ingredients.items():
-            content += f"{name}: {amount} {ingredient.measurement_unit}\n"
+            content += f'{name}: {amount} {ingredient.measurement_unit}\n'
 
         response = HttpResponse(content, content_type='text/plain')
         conf = 'attachment; filename="shopping_cart.txt"'

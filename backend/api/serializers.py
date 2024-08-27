@@ -2,10 +2,10 @@ import base64
 
 from django.contrib.auth import get_user_model
 from django.core.files.base import ContentFile
-from django.core.validators import MinValueValidator
 from djoser.serializers import UserCreateSerializer
 from rest_framework import serializers
 
+from .constants import AMOUNT_MIN_VALUE, COOKING_MIN_TIME, MAX_POSITIVE_VALUE
 from .models import Ingredient, Recipe, RecipeIngredient, Tag
 
 User = get_user_model()
@@ -21,14 +21,14 @@ class Base64ImageField(serializers.ImageField):
         Преобразует Base64-данные в объект изображения.
         """
         if not data:
-            raise serializers.ValidationError("Это поле не может быть пустым.")
+            raise serializers.ValidationError('Это поле не может быть пустым.')
 
         try:
             format, imgstr = data.split(';base64,')
             ext = format.split('/')[-1]
             data = ContentFile(base64.b64decode(imgstr), name=f'temp.{ext}')
         except Exception:
-            raise serializers.ValidationError("Неверный формат изображения.")
+            raise serializers.ValidationError('Неверный формат изображения.')
 
         return super().to_internal_value(data)
 
@@ -112,7 +112,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
         """
         Проверяет, подписан ли текущий пользователь на данного пользователя.
         """
-        request = self.context.get('request', None)
+        request = self.context['request']
         if request and request.user.is_authenticated:
             return obj.subscribers.filter(id=request.user.id).exists()
         return False
@@ -169,7 +169,10 @@ class IngredientInputSerializer(serializers.Serializer):
     """
 
     id = serializers.IntegerField()
-    amount = serializers.IntegerField(validators=[MinValueValidator(1)])
+    amount = serializers.IntegerField(
+        min_value=AMOUNT_MIN_VALUE,
+        max_value=MAX_POSITIVE_VALUE
+    )
 
 
 class CreateRecipeSerializer(serializers.ModelSerializer):
@@ -181,6 +184,10 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
     tags = serializers.ListField(
         child=serializers.IntegerField(), required=True)
     image = Base64ImageField()
+    cooking_time = serializers.IntegerField(
+        min_value=COOKING_MIN_TIME,
+        max_value=MAX_POSITIVE_VALUE
+    )
 
     class Meta:
         """
@@ -236,7 +243,7 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
         """
         Создание рецепта и привязка ингредиентов и тегов.
         """
-        request = self.context.get('request')
+        request = self.context['request']
         ingredients_data = validated_data.pop('ingredients')
         tags_data = validated_data.pop('tags')
         recipe = Recipe.objects.create(author=request.user, **validated_data)
@@ -319,7 +326,7 @@ class RecipeOutputSerializer(serializers.ModelSerializer):
         """
         Проверяет, находится ли рецепт в избранном у текущего пользователя.
         """
-        request = self.context.get('request', None)
+        request = self.context['request']
         user = request.user
         if request and user.is_authenticated:
             return obj.favorited_by.filter(user=user).exists()
@@ -330,7 +337,7 @@ class RecipeOutputSerializer(serializers.ModelSerializer):
         Проверяет, находится ли рецепт в корзине покупок
         у текущего пользователя.
         """
-        request = self.context.get('request', None)
+        request = self.context['request']
         user = request.user
         if request and user.is_authenticated:
             return obj.in_shopping_cart.filter(user=user).exists()
@@ -363,14 +370,16 @@ class SubscriptionsSerializer(CustomUserSerializer):
         Мета-класс для модели пользователя с добавлением
         полей для подписок и рецептов.
         """
-        fields = CustomUserSerializer.Meta.fields + \
-            ('recipes', 'recipes_count')
+        fields = (
+            CustomUserSerializer.Meta.fields
+            + ('recipes', 'recipes_count')
+        )
 
     def save(self, **kwargs):
         """
         Обрабатывает логику подписки при сохранении.
         """
-        request_user = self.context.get('request').user
+        request_user = self.context['request'].user
         user_to_subscribe = self.instance
 
         if request_user == user_to_subscribe:

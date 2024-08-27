@@ -1,12 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-import os
 
-
-def user_directory_path(instance, filename):
-    ext = filename.split('.')[-1]
-    filename = f'image_{instance.id}.{ext}'
-    return os.path.join('users', filename)
+from .utils import user_directory_path
 
 
 class CustomUser(AbstractUser):
@@ -26,3 +21,6 @@ class CustomUser(AbstractUser):
         ordering = ['id']
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
+
+    def __str__(self):
+        return self.username

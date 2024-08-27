@@ -7,5 +7,5 @@ class CustomPageNumberPagination(PageNumberPagination):
     количество элементов на странице.
     """
 
-    page_size = 1
+    page_size = 6
     page_size_query_param = 'limit'
